@@ -176,7 +176,7 @@ func (d *DatabaseCreator) CreateDatabase(name string) (*meta.DatabaseInfo, error
 	return nil, nil
 }
 
-func (d *DatabaseCreator) CreateRetentionPolicy(database string, spec *meta.RetentionPolicySpec) (*meta.RetentionPolicyInfo, error) {
+func (d *DatabaseCreator) CreateRetentionPolicy(database string, spec *meta.RetentionPolicySpec, makeDefault bool) (*meta.RetentionPolicyInfo, error) {
 	return nil, nil
 }
 

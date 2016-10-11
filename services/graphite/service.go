@@ -84,7 +84,7 @@ type Service struct {
 	MetaClient interface {
 		CreateDatabase(name string) (*meta.DatabaseInfo, error)
 		CreateDatabaseWithRetentionPolicy(name string, spec *meta.RetentionPolicySpec) (*meta.DatabaseInfo, error)
-		CreateRetentionPolicy(database string, spec *meta.RetentionPolicySpec) (*meta.RetentionPolicyInfo, error)
+		CreateRetentionPolicy(database string, spec *meta.RetentionPolicySpec, makeDefault bool) (*meta.RetentionPolicyInfo, error)
 		Database(name string) *meta.DatabaseInfo
 		RetentionPolicy(database, name string) (*meta.RetentionPolicyInfo, error)
 	}
@@ -140,7 +140,7 @@ func (s *Service) Open() error {
 	if db := s.MetaClient.Database(s.database); db != nil {
 		if rp, _ := s.MetaClient.RetentionPolicy(s.database, s.retentionPolicy); rp == nil {
 			spec := meta.RetentionPolicySpec{Name: s.retentionPolicy}
-			if _, err := s.MetaClient.CreateRetentionPolicy(s.database, &spec); err != nil {
+			if _, err := s.MetaClient.CreateRetentionPolicy(s.database, &spec, true); err != nil {
 				s.logger.Printf("Failed to ensure target retention policy %s exists: %s", s.database, err.Error())
 			}
 		}
