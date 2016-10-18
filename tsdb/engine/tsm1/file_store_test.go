@@ -2363,3 +2363,37 @@ func fatal(t *testing.T, msg string, err error) {
 func tsmFileName(id int) string {
 	return fmt.Sprintf("%09d-%09d.tsm", id, 1)
 }
+
+var fsResult []tsm1.FileStat
+
+func BenchmarkFileStore_Stats(b *testing.B) {
+	dir := MustTempDir()
+	defer os.RemoveAll(dir)
+
+	// Create some TSM files...
+	data := make([]keyValues, 0, 1000)
+	for i := 0; i < 1000; i++ {
+		data = append(data, keyValues{"cpu", []tsm1.Value{tsm1.NewValue(0, 1.0)}})
+	}
+
+	_, err := newFileDir(dir, data...)
+	if err != nil {
+		b.Fatalf("creating benchmark files %v", err)
+	}
+
+	fs := tsm1.NewFileStore(dir)
+	if !testing.Verbose() {
+		fs.SetLogOutput(ioutil.Discard)
+	}
+
+	if err := fs.Open(); err != nil {
+		b.Fatalf("opening file store %v", err)
+	}
+	defer fs.Close()
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		fsResult = fs.Stats()
+	}
+}
